@@ -3,7 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth.models import User
 from .models import Movie, Rating
 from .serializers import MovieSerializer, RatingSerializer, UserSerializer
@@ -12,7 +12,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     authentication_classes = (TokenAuthentication, )
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AllowAny, )
 
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
@@ -36,7 +36,7 @@ class MovieViewSet(viewsets.ModelViewSet):
                 response = {'message': 'Rating update', 'result': serializer.data}
                 return Response(response, status=status.HTTP_200_OK)
             except:
-                rating = Rating.objects.create(user=user.id, movie=movie.id, stars=stars)
+                rating = Rating.objects.create(user=user, movie=movie, stars=stars)
                 serializer = RatingSerializer(rating, many=False)
                 response = {'message': 'Rating created', 'result': serializer.data}
                 return Response(response, status=status.HTTP_200_OK)
